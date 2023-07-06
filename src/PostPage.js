@@ -1,10 +1,26 @@
-import React from 'react'
-import { useParams, Link } from 'react-router-dom'
+import axios from 'axios';
+import React, { useContext } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import DataContext from './context/DataContext';
 
 
-const PostPage = ({posts , handleDelete}) => {
+const PostPage = () => {
+  const URL = 'http://localhost:3500/posts';
   const { id }= useParams();
-  const post = posts.find(post => post.id == id);
+  const {posts ,setPosts} = useContext(DataContext);
+  const post = posts.find(post => (post.id).toString() === id);
+  const navigate = useNavigate();
+
+  const handleDelete = async(id)=>{
+    try {
+      await axios.delete(`${URL}/${id}`);
+      const newPosts = posts.filter(post=> post.id !== id);     
+      setPosts(newPosts);
+      navigate("/");
+    } catch (error) {
+       
+    }
+  }
 
   return (
     <main className='postPage'>

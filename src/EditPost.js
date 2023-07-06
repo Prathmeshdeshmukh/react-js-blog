@@ -1,10 +1,30 @@
-import React , { useEffect } from 'react'
-import { useParams, Link } from 'react-router-dom'
-const EditPost = ({
-    posts ,handleEdit, editBody, editTitle, setEditTitle, setEditBody
-}) => {
+import React , { useContext, useEffect, useState } from 'react'
+import { format } from 'date-fns';
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import DataContext from './context/DataContext';
+import axios from 'axios';
+const EditPost = () => {
+    const URL = 'http://localhost:3500/posts';
     const {id} = useParams();
+    const {posts, setPosts} = useContext(DataContext);
     const post = posts.find(post => post.id == id);
+    const navigate = useNavigate();
+    const [editBody, setEditBody] = useState("");
+    const [editTitle, setEditTitle] = useState("");
+
+  const handleEdit = async(id) =>{
+    const datetime = format(new Date(), 'MMMM dd, yyyy pp');
+    const updatedPost = { id, title: editTitle, datetime, body: editBody };
+    try {
+      const response = await axios.put(`${URL}/${id}`, updatedPost);
+      setPosts(posts.map(post => post.id === id ? {...response.data} : post))
+      setEditTitle('');
+      setEditBody('');
+      navigate('/');          
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
+  }
     useEffect(() => {
         if (post) {
             setEditTitle(post.title);
