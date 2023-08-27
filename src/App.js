@@ -13,24 +13,34 @@ import {
   Route,
   Routes,
 } from 'react-router-dom';
-import { DataProvider } from './context/DataContext';
+import useAxiosFetch from './hooks/useAxiosFetch';
+import { useEffect } from 'react';
+import { useStoreActions } from 'easy-peasy';
  
 
 function App() {
+  const { data, fetchError, isLoading } = useAxiosFetch('https://jsonplaceholder.typicode.com/posts');
+  const setPosts = useStoreActions((actions) => actions.setPosts)
+
+    useEffect(() => {
+        setPosts(data); 
+    }, [data])
   return (
     <div className="App">  
-      <DataProvider> 
+       
         <Header title= "React JS Blog"/>
         <Nav/>
         <Routes>
-          <Route path="/" element={<Home/>} />
+          <Route path="/" element={<Home 
+            isLoading ={isLoading}
+            fetchError={fetchError}
+          />} />
           <Route path="/post" element={<NewPost/>} />
           <Route path="/post/:id" element={<PostPage/>} />
           <Route path="/about" element={<About />} />
-          <Route path= "/edit/:id" element= {<EditPost />}/>
+          <Route path= "/edit/:id" element = {<EditPost />}/>
           <Route path="*" element={<Missing />} />
         </Routes>
-      </DataProvider>
       <Footer />
       </div>
   );

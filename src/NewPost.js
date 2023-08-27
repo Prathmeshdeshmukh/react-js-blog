@@ -1,32 +1,27 @@
-import React, { useContext , useState} from 'react'
+import React, { useContext, useState } from 'react'
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-import DataContext from './context/DataContext';
-import axios from 'axios';
+import { useStoreActions, useStoreState } from 'easy-peasy';
 
 const NewPost = () => {
-  const URL = 'http://localhost:3500/posts';
+  const URL = 'https://jsonplaceholder.typicode.com/posts';
   const navigate = useNavigate();
-  const {posts , setPosts} = useContext(DataContext);
-  const [postTitle, setPostTitle] = useState("");
-  const [postBody, setPostBody] = useState("");
+  const posts = useStoreState((state) => state.posts);
+  const postTitle = useStoreState((state) => state.postTitle);
+  const postBody = useStoreState((state) => state.postBody);
+
+  const savePost = useStoreActions((actions) => actions.savePost);
+  const setPostTitle = useStoreActions((actions) => actions.setPostTitle);
+  const setPostBody = useStoreActions((actions) => actions.setPostBody);
 
 
-  const handleSubmit = async(e)=>{
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const id = posts.length ? posts[posts.length-1].id +1 : 1;
+    const id = posts.length ? posts[posts.length - 1].id + 1 : 1;
     const datetime = format(new Date(), 'MMMM dd, yyyy pp');
-    const newPost = { id , title : postTitle, datetime, body: postBody};
-    try {
-      const response = await axios.post(URL, newPost);
-      const allPosts = [...posts, response.data];
-      setPosts(allPosts);
-      setPostTitle('');
-      setPostBody('');
-      navigate('/');          
-    } catch (error) {
-      console.log(error)
-    }
+    const newPost = { id, title: postTitle, datetime, body: postBody };
+    savePost(newPost);
+    navigate('/');
   }
 
   return (
@@ -34,22 +29,22 @@ const NewPost = () => {
       <h2>New Post</h2>
       <form className="newPostForm" onSubmit={handleSubmit} >
         <label htmlFor="postTitle">Title:</label>
-        <input 
-            id='postTitle'
-            type="text"
-            required
-            value={postTitle}
-            onChange={(e)=> setPostTitle(e.target.value)}
+        <input
+          id='postTitle'
+          type="text"
+          required
+          value={postTitle}
+          onChange={(e) => setPostTitle(e.target.value)}
         />
         <label htmlFor="postBody">Post:</label>
-        <textarea 
-            id='postBody'
-            required
-            value={postBody}
-            onChange={(e)=> setPostBody(e.target.value)}
+        <textarea
+          id='postBody'
+          required
+          value={postBody}
+          onChange={(e) => setPostBody(e.target.value)}
         />
         <button type='submit'>Post</button>
-      </form> 
+      </form>
     </main>
   )
 }

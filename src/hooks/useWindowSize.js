@@ -15,14 +15,11 @@ const useWindowSize = () => {
         });
     }
         handleResize();
-
         window.addEventListener('resize', handleResize);
-
         const cleanup = ()=>{
             window.removeEventListener('resize', handleResize);
         }
         return cleanup;
-    
   }, [])
 
   return windowSize;
